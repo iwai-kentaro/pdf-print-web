@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
         "--disable-software-rasterizer",
       ],
       executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
-      headless: "new",
+      headless: true,
     });
 
     console.log("Opening new page...");
