@@ -9,6 +9,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log("Starting Puppeteer...");
+
     const browser = await puppeteer.launch({
       args: [
         "--no-sandbox",
@@ -17,13 +18,15 @@ export async function POST(req: NextRequest) {
         "--disable-gpu",
         "--disable-software-rasterizer",
       ],
-      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
-      headless: true,
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/google-chrome-stable",
+      headless: true, // "new" ではなく true を使用
     });
 
     console.log("Opening new page...");
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: "networkidle2" });
+
+    // ページ遷移を軽くする
+    await page.goto(url, { waitUntil: "domcontentloaded" });
 
     console.log("Generating PDF...");
     const pdfBuffer = await page.pdf({
@@ -44,6 +47,6 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error("Failed to generate PDF:", error);
-    return NextResponse.json({ error: "Failed to generate PDF" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to generate PDF", details: (error as Error).toString() }, { status: 500 });
   }
 }
