@@ -1,10 +1,19 @@
+"use client";
 import Image from "next/image";
 import styles from "./page.module.css";
+import usePage from "../hooks/usePage";
 
-export default function Home() {
+const Home = () => {
+  const { handleClickPDF, handleChangeURL } = usePage();
   return (
     <div className={styles.page}>
       <main className={styles.main}>
+        <input
+          type="text"
+          placeholder="PDF化するページのURL"
+          onChange={handleChangeURL}
+        />
+        <button onClick={handleClickPDF}>PDF作成</button>
         <Image
           className={styles.logo}
           src="/next.svg"
@@ -92,4 +101,5 @@ export default function Home() {
       </footer>
     </div>
   );
-}
+};
+export default Home;
