@@ -1,7 +1,7 @@
 {
   "functions": {
-    "api/generate-pdf.ts": {
-      "memory": 300,
+    "api/generate-pdf/route.ts": {
+      "memory": 512,
       "maxDuration": 10
     }
   }

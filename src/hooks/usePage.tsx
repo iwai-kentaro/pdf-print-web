@@ -12,13 +12,12 @@ const usePage = () => {
   };
 
   const handleClickPDF = async () => {
-    const currentUrl = window.location.href; // 現在のページのURLを取得
-
     try {
+      const currentUrl = window.location.href;
       const response = await fetch("/api/generate-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: currentUrl }), // 現在のページのURLを送信
+        body: JSON.stringify({ url: currentUrl }),
       });
 
       if (!response.ok) {
@@ -27,18 +26,17 @@ const usePage = () => {
 
       const blob = await response.blob();
       const downloadUrl = window.URL.createObjectURL(blob);
-
       const a = document.createElement("a");
       a.href = downloadUrl;
       a.download = "document.pdf";
-      document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-    } catch (error) {
-      console.error(error);
+      a.remove();
+    } catch (err) {
+      console.error(err);
       alert("エラーが発生しました");
     }
   };
+
   return {
     handleClickPDF,
     handleChangeURL,

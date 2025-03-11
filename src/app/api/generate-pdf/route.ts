@@ -1,7 +1,5 @@
-// app/api/generate-pdf/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import puppeteer from "puppeteer-core";
-import chromium from "chrome-aws-lambda";
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,29 +8,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "URL is required" }, { status: 400 });
     }
 
-    // 環境に応じて Puppeteer の実行パスを設定
-    const executablePath =
-      process.env.AWS_REGION !== undefined
-        ? await chromium.executablePath
-        : undefined; // ローカルなら Puppeteer が自動で探す
-
+    console.log("Starting Puppeteer...");
     const browser = await puppeteer.launch({
-      args: chromium.args,
-      executablePath,
-      headless: true,
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--disable-gpu",
+        "--disable-software-rasterizer",
+      ],
+      executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || "/usr/bin/chromium-browser",
+      headless: "new",
     });
 
+    console.log("Opening new page...");
     const page = await browser.newPage();
     await page.goto(url, { waitUntil: "networkidle2" });
 
+    console.log("Generating PDF...");
     const pdfBuffer = await page.pdf({
       format: "A4",
-      printBackground: true, // 背景色や画像を含める
+      printBackground: true,
       margin: { top: "10mm", right: "10mm", bottom: "10mm", left: "10mm" },
     });
 
     await browser.close();
 
+    console.log("PDF Generated Successfully");
     return new NextResponse(pdfBuffer, {
       status: 200,
       headers: {
